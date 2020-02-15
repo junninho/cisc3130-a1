@@ -118,6 +118,8 @@ public class Main {
       }
     }
 
+    System.out.println("\n--\n");
+
     TopStreamingArtists tsa = new TopStreamingArtists();
     for (int r = 0; r < aList.length ; r++ ) {
       if (aList[r][0] != null) {
