@@ -58,7 +58,7 @@ class TopStreamingArtists {
 public class Main {
 
   public static String[][] Array2DSolution(String file) throws Exception {
-    String[][] artistCount = new String[200][2];
+    String[][] artistCount;
 
     try (FileInputStream fis = new FileInputStream(file);
       InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
@@ -70,32 +70,40 @@ public class Main {
         artists.add(nextLine[2]);
       }
 
+      artistCount = new String[artists.size()][2];
+
       int count = 0;
       for (String artist : artists) {
-        boolean DNE = true;
-        for (int j = 0; j < count; j++){
-          if (artistCount[j][0] == artist) {
-            DNE = false;
-          }
-        }
-
-        if (DNE) {
-          for (int r = 0; r < 200 ; r++ ) {
-            if (artistCount[r][0] == null) {
-              artistCount[r][0] = artist;
-              artistCount[r][1] = Long.toString(artists.stream().filter(p -> p.equals(artist)).count());
-              break;
+          boolean exists = false;
+          for (int j = 0; j < artistCount.length; j++){
+            try {
+              if (artistCount[j][0].equals(artist)) {
+                exists = true;
+              }
+            } catch (NullPointerException e) {
+              ;
             }
           }
-        } else {
-          for (int r = 0; r < 200 ; r++ ) {
-            if (artistCount[r][0] == artist) {
-              int temp = Integer.parseInt(artistCount[r][1]);
-              artistCount[r][1] = Integer.toString(temp + 1);
+          if (!exists) {
+            for (int r = 0; r < artistCount.length ; r++ ) {
+              if (artistCount[r][0] == null) {
+                artistCount[r][0] = artist;
+                artistCount[r][1] = Long.toString(artists.stream().filter(p -> p.equals(artist)).count());
+                break;
+              }
+            }
+          } else {
+            for (int r = 0; r < artistCount.length; r++ ) {
+              try {
+                if (artistCount[r][0].equals(artist)) {
+                  int temp = Integer.parseInt(artistCount[r][1]);
+                  artistCount[r][1] = Integer.toString(temp + 1);
+                }
+              } catch (NullPointerException e){
+                ;
+              }
             }
           }
-        }
-
         
       }
     }
@@ -103,16 +111,20 @@ public class Main {
     return artistCount;
   }
   public static void main(String [] args) throws Exception{    
-    // System.out.println(Arrays.deepToString(Array2DSolution("data/regional-us-weekly-latest.csv")));
-
-    TopStreamingArtists tsa = new TopStreamingArtists();
     String[][] aList = Array2DSolution("data/regional-us-weekly-latest.csv");
-    for (int r = 0; r < 200 ; r++ ) {
-      tsa.insert(aList[r][0]);
+    for (int i = 0; i < aList.length; i++){
+      if (aList[i][0] != null) {
+        System.out.printf("%s appeared %s times\n", aList[i][0], aList[i][1]);
+      }
     }
 
-    tsa.displayList();
-    System.out.println();
+    TopStreamingArtists tsa = new TopStreamingArtists();
+    for (int r = 0; r < aList.length ; r++ ) {
+      if (aList[r][0] != null) {
+        tsa.insert(aList[r][0]);
+      }
+    }
+
     tsa.displayAlphabeticalList();
 
   }
